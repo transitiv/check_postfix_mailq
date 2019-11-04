@@ -61,6 +61,6 @@ sys     0m0.012s
 ## Future plans
 
 * Implement a prometheus exporter as separate project
-** watch postfix queue directories using inotify
-** collect more details about messages e.g. lifetime, hops, etc.
-** directly read queued files; do NOT analyze postfix log messages
+  * watch postfix queue directories using inotify
+  * collect more details about messages e.g. lifetime, hops, etc.
+  * directly read queued files; do NOT analyze postfix log messages
