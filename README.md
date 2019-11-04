@@ -56,6 +56,7 @@ sys     0m0.012s
 
 ## TODO
 
+* add support to check recipient count
 * add perfdata about mail delivery status (deferred, active, hold)
 
 ## Future plans
