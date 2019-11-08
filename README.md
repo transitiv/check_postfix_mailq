@@ -50,9 +50,7 @@ user    0m0.148s
 sys     0m0.012s
 ```
 
-## Future plans
+## Alternative monitoring solutions
 
-* Implement a prometheus exporter as separate project
-  * watch postfix queue directories using inotify
-  * collect more details about messages e.g. lifetime, hops, etc.
-  * directly read queued files; do NOT analyze postfix log messages
+* https://github.com/kumina/postfix_exporter
+* https://github.com/google/mtail
