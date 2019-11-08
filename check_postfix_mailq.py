@@ -29,7 +29,7 @@ def validate_int(input):
         exit(3)
     return int(input)
 
-def check_mailq(input, sender_filter, perfdata_details, count_warning, count_critical, size_warning, size_critical):
+def check_mailq(input, sender_filter, perfdata_details, count_warning, count_critical, size_warning, size_critical, recipients_warning, recipients_critical):
     mailq_count = Counter()
     mailq_size = Counter()
     mailq_recipients = Counter()
@@ -53,7 +53,8 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
 
     sum_mailq_count = sum(mailq_count.values())
     sum_mailq_size = sum(mailq_size.values())
-    perfdata = ['count=%i;%i;%i;;' % (sum_mailq_count, count_warning, count_critical), 'size=%iB;%i;%i;;' % (sum_mailq_size, size_warning, size_critical)]
+    sum_mailq_recipients = sum(mailq_recipients.values())
+    perfdata = ['count=%i;%i;%i;;' % (sum_mailq_count, count_warning, count_critical), 'size=%iB;%i;%i;;' % (sum_mailq_size, size_warning, size_critical), 'recipients=%i;%i;%i;;' % (sum_mailq_recipients, recipients_warning, recipients_critical)]
     if perfdata_details:
         for k, v in mailq_count.items():
             perfdata += ['count[%s]=%i' % (k, v)]
@@ -68,6 +69,12 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
 
     if sum_mailq_count >= count_warning:
         return 1, 'WARNING: mailq count >%i | %s' % (count_warning, perfdata)
+
+    if recipients_critical >0 and sum_mailq_recipients >= recipients_critical:
+        return 2, 'CRITICAL: recipient count in mailq for filtered sender >%i | %s' % (recipients_critical, perfdata)
+
+    if recipients_warning >0 and sum_mailq_recipients >= recipients_warning:
+        return 1, 'WARNING: recipient count in mailq for filtered sender >%i | %s' % (recipients_warning, perfdata)
 
     if size_critical > 0 and sum_mailq_size >= size_critical:
         return 2, 'CRITICAL: mailq size >%i | %s' % (size_critical, perfdata)
@@ -85,6 +92,8 @@ if __name__ == '__main__':
     parser.add_argument('--count-critical', type=validate_int, required=True, help="Generate critical if mailq entries exceeds this threshold")
     parser.add_argument('--size-warning', type=validate_int, default=0, required=False, help="Generate warning if size in bytes of mails in mailq exceeds this threshold")
     parser.add_argument('--size-critical', type=validate_int, default=0, required=False, help="Generate critical if size in bytes of mails in mailq exceeds this threshold")
+    parser.add_argument('--recipients-warning', type=validate_int, default=0, required=False, help='Generate warning if sum of all recipients exceeds this threshold (recipients that belong to sender that match the defined filter; default is to match all senders)')
+    parser.add_argument('--recipients-critical', type=validate_int, default=0, required=False, help='Generate critical if sum of all recipients exceeds this threshold (recipients that belong to sender that match the defined filter; default is to match all senders)')
     parser.add_argument('--perfdata-details', action='store_true', help='Print details about single sender addresses in perfdata')
     args = parser.parse_args(argv[1:])
 
@@ -94,6 +103,10 @@ if __name__ == '__main__':
 
     if args.size_warning > 0 and args.size_warning >= args.size_critical:
         print('UNKNOWN: size warning must be greater than critical')
+        exit(3)
+
+    if args.recipients_warning > 0 and args.recipients_warning >= args.recipients_critical:
+        print('UNKNOWN: recipients warning must be greater than critical')
         exit(3)
 
     try:
@@ -109,6 +122,6 @@ if __name__ == '__main__':
         # check_output already wrote to STDERR - just exit here
         exit(3)
 
-    ret = check_mailq(mailq, sender_filter, args.perfdata_details,args.count_warning, args.count_critical, args.size_warning, args.size_critical)
+    ret = check_mailq(mailq, sender_filter, args.perfdata_details,args.count_warning, args.count_critical, args.size_warning, args.size_critical, args.recipients_warning, args.recipients_critical)
     print(ret[1])
     exit(ret[0])
