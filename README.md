@@ -41,10 +41,12 @@ python3 -m unittest discover -s tests
 Run a short performance test (mailq output read from a local file):
 
 ```bash
+$ mkdir -p ~/.local/bin
 $ cat <<EOF >~/.local/bin/mailq
 #!/bin/bash
 cat tests/mailq.performance
 EOF
+$ chmod +x ~/.local/bin/mailq
 $ export PATH=~/.local/bin:$PATH
 $ time ./check_postfix_mailq.py --count-warning 5 --count-critical 10 --perfdata-details
 CRITICAL: mailq count >10 | count=4676;5;10;; count[MAILER-DAEMON]=668 count[sender1@domain1.com]=1336 count[sender2@domain2.com]=668 count[sender3@domain2.com]=668 count[sender3@domain3.com]=668 count[sender4@domain4.com]=668 recipients[MAILER-DAEMON]=668 recipients[sender1@domain1.com]=2672 recipients[sender2@domain2.com]=668 recipients[sender3@domain2.com]=668 recipients[sender3@domain3.com]=668 recipients[sender4@domain4.com]=1336 size=72010400B;0;0;; size[MAILER-DAEMON]=12448848B size[sender1@domain1.com]=22188956B size[sender2@domain2.com]=13885048B size[sender3@domain2.com]=330660B size[sender3@domain3.com]=22829568B size[sender4@domain4.com]=327320B
