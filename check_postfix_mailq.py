@@ -33,6 +33,9 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
     mailq_count = Counter()
     mailq_size = Counter()
     mailq_recipients = Counter()
+    mailq_state_active = 0
+    mailq_state_hold = 0
+    mailq_state_deferred = 0
     current_sender = None
 
     re_sender = compile('^[0-9A-F]{10}([!\*]?)\s+([0-9]+)\s+.*\s+(%s)$' % sender_filter, IGNORECASE)
@@ -47,6 +50,12 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
                     current_sender = sender_match.group(3)
                     mailq_count[current_sender] += 1
                     mailq_size[current_sender] += int(sender_match.group(2))
+                    if sender_match.group(1) == '!':
+                        mailq_state_hold += 1
+                    elif sender_match.group(1) == '*':
+                        mailq_state_active += 1
+                    else:
+                        mailq_state_deferred += 1
             else:
                 if search(re_recipient, line):
                     mailq_recipients[current_sender] += 1
@@ -54,7 +63,7 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
     sum_mailq_count = sum(mailq_count.values())
     sum_mailq_size = sum(mailq_size.values())
     sum_mailq_recipients = sum(mailq_recipients.values())
-    perfdata = ['count=%i;%i;%i;;' % (sum_mailq_count, count_warning, count_critical), 'size=%iB;%i;%i;;' % (sum_mailq_size, size_warning, size_critical), 'recipients=%i;%i;%i;;' % (sum_mailq_recipients, recipients_warning, recipients_critical)]
+    perfdata = ['count=%i;%i;%i;;' % (sum_mailq_count, count_warning, count_critical), 'active=%i;;;;' % mailq_state_active, 'hold=%i;;;;' % mailq_state_hold, 'deferred=%i;;;;' % mailq_state_deferred, 'size=%iB;%i;%i;;' % (sum_mailq_size, size_warning, size_critical), 'recipients=%i;%i;%i;;' % (sum_mailq_recipients, recipients_warning, recipients_critical)]
     if perfdata_details:
         for k, v in mailq_count.items():
             perfdata += ['count[%s]=%i' % (k, v)]

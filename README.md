@@ -9,10 +9,10 @@ It runs different checks on the `mailq` output and provides detailed perfdata.
 
 ```bash
 $ ./check_postfix_mailq.py --count-warning 5 --count-critical 10
-WARNING: mailq count >5 | count=7;5;10;; size=107800B;0;0;;
+WARNING: mailq count >5 | active=1;;;; count=7;5;10;; deferred=5;;;; hold=1;;;; recipients=10;0;0;; size=107800B;0;0;;
 
 $ ./check_postfix_mailq.py --count-warning 5 --count-critical 10 --perfdata-details
-WARNING: mailq count >5 | count=7;5;10;; count[MAILER-DAEMON]=1 count[sender1@domain1.com]=2 count[sender2@domain2.com]=1 count[sender3@domain2.com]=1 count[sender3@domain3.com]=1 count[sender4@domain4.com]=1 recipients[MAILER-DAEMON]=1 recipients[sender1@domain1.com]=4 recipients[sender2@domain2.com]=1 recipients[sender3@domain2.com]=1 recipients[sender3@domain3.com]=1 recipients[sender4@domain4.com]=2 size=107800B;0;0;; size[MAILER-DAEMON]=18636B size[sender1@domain1.com]=33217B size[sender2@domain2.com]=20786B size[sender3@domain2.com]=495B size[sender3@domain3.com]=34176B size[sender4@domain4.com]=490B
+WARNING: mailq count >5 | active=1;;;; count=7;5;10;; count[MAILER-DAEMON]=1 count[sender1@domain1.com]=2 count[sender2@domain2.com]=1 count[sender3@domain2.com]=1 count[sender3@domain3.com]=1 count[sender4@domain4.com]=1 deferred=5;;;; hold=1;;;; recipients=10;0;0;; recipients[MAILER-DAEMON]=1 recipients[sender1@domain1.com]=4 recipients[sender2@domain2.com]=1 recipients[sender3@domain2.com]=1 recipients[sender3@domain3.com]=1 recipients[sender4@domain4.com]=2 size=107800B;0;0;; size[MAILER-DAEMON]=18636B size[sender1@domain1.com]=33217B size[sender2@domain2.com]=20786B size[sender3@domain2.com]=495B size[sender3@domain3.com]=34176B size[sender4@domain4.com]=490B
 ```
 
 ## Requirements
