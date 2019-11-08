@@ -33,14 +33,22 @@ Run unit tests:
 
 ```bash
 # Run in git directory of check_postfix_mailq
-export PYTHONPATH=$PWD:$PYTHONPATH
-python2 -m unittest discover -s tests
-python3 -m unittest discover -s tests
+$ mkdir -p ~/.local/bin
+$ cat <<EOF >~/.local/bin/mailq
+#!/bin/bash
+cat tests/mailq.test
+EOF
+$ chmod +x ~/.local/bin/mailq
+$ export PATH=~/.local/bin:$PATH
+$ export PYTHONPATH=$PWD:$PYTHONPATH
+$ python2 -m unittest discover -s tests
+$ python3 -m unittest discover -s tests
 ```
 
 Run a short performance test (mailq output read from a local file):
 
 ```bash
+# Run in git directory of check_postfix_mailq
 $ mkdir -p ~/.local/bin
 $ cat <<EOF >~/.local/bin/mailq
 #!/bin/bash
