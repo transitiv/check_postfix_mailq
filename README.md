@@ -50,10 +50,6 @@ user    0m0.148s
 sys     0m0.012s
 ```
 
-## TODO
-
-* add perfdata about mail delivery status (deferred, active, hold)
-
 ## Future plans
 
 * Implement a prometheus exporter as separate project
