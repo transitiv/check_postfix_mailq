@@ -41,14 +41,15 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
     for line in input.decode('utf-8').split('\n'):
         line = line.rstrip(linesep)
         if len(line) > 0:
-            if search(re_recipient, line):
-                mailq_recipients[current_sender] += 1
-            else:
+            if line[0] in ['A', 'B', 'C', 'D', 'E', 'F', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                 sender_match = search(re_sender, line)
                 if sender_match:
                     current_sender = sender_match.group(3)
                     mailq_count[current_sender] += 1
                     mailq_size[current_sender] += int(sender_match.group(2))
+            else:
+                if search(re_recipient, line):
+                    mailq_recipients[current_sender] += 1
 
     sum_mailq_count = sum(mailq_count.values())
     sum_mailq_size = sum(mailq_size.values())
