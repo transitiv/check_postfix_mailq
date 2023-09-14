@@ -28,6 +28,18 @@ def validate_int(input):
         exit(3)
     return int(input)
 
+def format_bytes(bytes):
+    if bytes >= 1099511627776:
+        return "%.2fTiB" % (bytes / 1099511627776)
+    elif bytes >= 1073741824:
+        return "%.2fGiB" % (bytes / 1073741824)
+    elif bytes >= 1048576:
+        return "%.2fMiB" % (bytes / 1048576)
+    elif bytes >= 1024:
+        return "%.2fKiB" % (bytes / 1024)
+    else:
+        return "%iB" % bytes
+
 def check_mailq(input, sender_filter, perfdata_details, count_warning, count_critical, size_warning, size_critical, recipients_warning, recipients_critical):
     mailq_count = Counter()
     mailq_size = Counter()
@@ -80,24 +92,21 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
     perfdata = ' '.join(sorted(perfdata))
 
     if sum_mailq_count >= count_critical:
-        return 2, 'CRITICAL: mailq count >%i | %s' % (count_critical, perfdata)
-
-    if sum_mailq_count >= count_warning:
-        return 1, 'WARNING: mailq count >%i | %s' % (count_warning, perfdata)
-
-    if recipients_critical >0 and sum_mailq_recipients >= recipients_critical:
-        return 2, 'CRITICAL: recipient count in mailq for filtered sender >%i | %s' % (recipients_critical, perfdata)
-
-    if recipients_warning >0 and sum_mailq_recipients >= recipients_warning:
-        return 1, 'WARNING: recipient count in mailq for filtered sender >%i | %s' % (recipients_warning, perfdata)
-
-    if size_critical > 0 and sum_mailq_size >= size_critical:
-        return 2, 'CRITICAL: mailq size >%i | %s' % (size_critical, perfdata)
-
-    if size_warning > 0 and sum_mailq_size >= size_critical:
-        return 1, 'WARNING: mailq size >%i | %s' % (size_critical, perfdata)
-
-    return 0, 'OKAY: mailq count and size okay | %s' % perfdata
+        return 2, 'CRITICAL: %i mails in queue | %s' % (sum_mailq_count, perfdata)
+    elif sum_mailq_count >= count_warning:
+        return 1, 'WARNING: %i mails in queue | %s' % (sum_mailq_count, perfdata)
+    elif recipients_critical >0 and sum_mailq_recipients >= recipients_critical:
+        return 2, 'CRITICAL: %i recipients in mail queue for filtered sender | %s' % (sum_mailq_recipients, perfdata)
+    elif recipients_warning >0 and sum_mailq_recipients >= recipients_warning:
+        return 1, 'WARNING: %i recipients in mail queue for filtered sender | %s' % (sum_mailq_recipients, perfdata)
+    elif size_critical > 0 and sum_mailq_size >= size_critical:
+        return 2, 'CRITICAL: mail queue size is %s | %s' % (format_bytes(sum_mailq_size), perfdata)
+    elif size_warning > 0 and sum_mailq_size >= size_critical:
+        return 1, 'WARNING: mail queue size is %s | %s' % (format_bytes(sum_mailq_size), perfdata)
+    elif sum_mailq_count > 0:
+        return 0, 'OK: %d items in mail queue using %s | %s' % (sum_mailq_count, format_bytes(sum_mailq_size), perfdata)
+    else:
+        return 0, 'OK: mail queue is empty | %s' % (perfdata)
 
 
 if __name__ == '__main__':
