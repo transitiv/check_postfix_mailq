@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 # Icinga/Nagios plugin to check the postfix mailq
 # For details see: $0 --help
 
@@ -63,7 +62,14 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
     sum_mailq_count = sum(mailq_count.values())
     sum_mailq_size = sum(mailq_size.values())
     sum_mailq_recipients = sum(mailq_recipients.values())
-    perfdata = ['count=%i;%i;%i;;' % (sum_mailq_count, count_warning, count_critical), 'active=%i;;;;' % mailq_state_active, 'hold=%i;;;;' % mailq_state_hold, 'deferred=%i;;;;' % mailq_state_deferred, 'size=%iB;%i;%i;;' % (sum_mailq_size, size_warning, size_critical), 'recipients=%i;%i;%i;;' % (sum_mailq_recipients, recipients_warning, recipients_critical)]
+    perfdata = [
+        'count=%i;%i;%i;;' % (sum_mailq_count, count_warning, count_critical),
+        'active=%i;;;;' % mailq_state_active,
+        'hold=%i;;;;' % mailq_state_hold,
+        'deferred=%i;;;;' % mailq_state_deferred,
+        'size=%iB;%i;%i;;' % (sum_mailq_size, size_warning, size_critical),
+        'recipients=%i;%i;%i;;' % (sum_mailq_recipients, recipients_warning, recipients_critical)
+    ]
     if perfdata_details:
         for k, v in mailq_count.items():
             perfdata += ['count[%s]=%i' % (k, v)]
@@ -95,7 +101,7 @@ def check_mailq(input, sender_filter, perfdata_details, count_warning, count_cri
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Check postfix mailq nagios/icinga plugins')
+    parser = ArgumentParser(description='Nagios / Icinga plugin to monitor the Postfix mail queue')
     parser.add_argument('--sender-filter', type=validate_email, required=False, help='Check only mailq entries which given email address or domain, e.g. "noreply@example.com" or "@example.net')
     parser.add_argument('--count-warning', type=validate_int, required=True, help="Generate warning if mailq entries exceeds this threshold")
     parser.add_argument('--count-critical', type=validate_int, required=True, help="Generate critical if mailq entries exceeds this threshold")
@@ -109,12 +115,10 @@ if __name__ == '__main__':
     if args.count_warning >= args.count_critical:
         print('UNKNOWN: count warning must be greater than critical')
         exit(3)
-
-    if args.size_warning > 0 and args.size_warning >= args.size_critical:
+    elif args.size_warning > 0 and args.size_warning >= args.size_critical:
         print('UNKNOWN: size warning must be greater than critical')
         exit(3)
-
-    if args.recipients_warning > 0 and args.recipients_warning >= args.recipients_critical:
+    elif args.recipients_warning > 0 and args.recipients_warning >= args.recipients_critical:
         print('UNKNOWN: recipients warning must be greater than critical')
         exit(3)
 
